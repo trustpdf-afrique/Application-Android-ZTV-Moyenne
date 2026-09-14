@@ -1,4 +1,4 @@
-name: Construire ZTV Moyenne
+name: ZTV Moyenne APK
 
 on:
   workflow_dispatch:
@@ -11,14 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Récupérer les fichiers
+      - name: Récupérer le dépôt
         uses: actions/checkout@v4
-
-      - name: Décompresser le projet
-        run: |
-          unzip -q ZTV_Moyenne_Android.zip
-          cd ZTV_Moyenne_Android
-          echo "Projet décompressé"
 
       - name: Installer Java 17
         uses: actions/setup-java@v4
@@ -29,17 +23,19 @@ jobs:
       - name: Installer Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Installer Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
+      - name: Décompresser le projet
+        run: |
+          unzip -o ZTV_Moyenne_Android.zip
+          cd ZTV_Moyenne_Android
+          ls -la
 
       - name: Construire l'APK
+        working-directory: ZTV_Moyenne_Android
         run: |
-          cd ZTV_Moyenne_Android
-          gradle :app:assembleDebug --no-daemon
+          chmod +x gradlew 2>/dev/null || true
+          gradle :app:assembleDebug --no-daemon --stacktrace
 
-      - name: Récupérer l'APK
+      - name: Télécharger l'APK
         uses: actions/upload-artifact@v4
         with:
           name: ZTV-Moyenne-APK
